@@ -8,6 +8,8 @@
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
+import Analytics from 'appcenter-analytics';
+import Crashes from 'appcenter-crashes'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,12 +20,36 @@ const instructions = Platform.select({
 
 type Props = {};
 export default class App extends Component<Props> {
+  sendEvent = () => {
+    Analytics.trackEvent('My Custom Event', {
+      prop1: new Date().getSeconds()
+    })
+  }
+
+  nativeCrash = () => {
+    Crashes.generateTestCrash();
+  }
+
+  jsCrash = () => {
+    this.func1();
+  }
+
+  func1() {this.func2()}
+  func2() {this.func3()}
+  func3() {this.func4()}
+  func4() {this.func5()}
+  
+  func5() {
+    throw new Error("My uncaught JS exception")
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Button title="Send Event" onPress={() => this.sendEvent()} />
+        <Button title="Native Crash" onPress={() => this.nativeCrash()} />
+        <Button title="JS Crash" onPress={() => this.jsCrash()} />
       </View>
     );
   }
